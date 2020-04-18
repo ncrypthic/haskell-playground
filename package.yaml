@@ -1,0 +1,13 @@
+name: haskell
+dependencies:
+  - base
+  - mysql-haskell
+  - io-streams
+license: MIT
+
+executable:
+  source-dirs: app src
+  main: Main.hs
+  other-modules:
+    Lim.Echo
+    Authentication.User
