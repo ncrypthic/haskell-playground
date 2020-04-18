@@ -1,6 +1,7 @@
 name: haskell
 dependencies:
   - base
+  - text
   - mysql-haskell
   - io-streams
 license: MIT

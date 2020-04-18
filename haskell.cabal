@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 062d6caecd1ebeb309a3e3ed21a602e6205e2fc57e7ddc6a183330dca7c507e1
+-- hash: 5283baad49d41e3a321e913ca6cd1cc16824e8831e456729f3296704ea23bf37
 
 name:           haskell
 version:        0.0.0
@@ -22,4 +22,5 @@ executable haskell
       base
     , io-streams
     , mysql-haskell
+    , text
   default-language: Haskell2010
