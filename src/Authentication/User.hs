@@ -1,42 +1,38 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Authentication.User
-    ( register
-    , findUserById
+    ( findUserById
     , userName
     ) where
 
 import Data.Maybe
 import Control.Monad
 import System.IO
-import Data.Text
+import Data.Text (unpack, pack)
 import Database.MySQL.Base
 import qualified System.IO.Streams as Streams
+import System.IO.Streams (InputStream)
 
-data User = User { username::String
-            , password::String
-            , email::String } deriving (Eq, Show, Ord)
+class Serializable m where
+    serialize :: m -> Maybe [MySQLValue]
+    unserialize :: [MySQLValue] -> Maybe m
 
-userName :: User -> String
-userName (User username _ _) = username
+data User = User {userName::String,
+                  password::String,
+                  email::String } deriving (Eq, Show, Ord)
 
-makeUser :: String -> String -> String -> User
-makeUser uname passwd email = User{username=uname, password=passwd, email=email}
-
-mapUser :: Text -> Text -> Text -> User
-mapUser uname passwd email = User{username=unpack uname, password=unpack passwd, email= unpack email}
-
-register :: User -> Maybe User
-register user = Nothing
+instance Serializable User where
+    serialize (User uname pass email) = Just(MySQLText . pack <$> [uname, pass, email])
+    unserialize [MySQLText uname, MySQLText pass, MySQLText email] =  Just (User (unpack uname) (unpack pass) (unpack email))
+    unserialize [] = Nothing
 
 -- TODO: Itchy
-unwrap :: [MySQLValue] -> Maybe User
-unwrap xs =  case xs of {
-                 ; [MySQLText uname, MySQLText pass, MySQLText x] -> Just(mapUser uname pass x)
-                 ; _ ->  Nothing
-               }
+-- unwrap :: [MySQLValue] -> Maybe User
+-- unwrap xs = case xs of
+--               [uname, pass, x] -> Just(UserRecord uname pass x)
+--               [] ->  Nothing
 
 findUserById :: MySQLConn -> String -> IO (Maybe User)
 findUserById conn id = do
-    (columnDefs, inputStream) <- query_ conn "SELECT UserName, Password, UserName FROM TblUser LIMIT 1"
+    (columnDefs, inputStream) <- query conn "SELECT UserName, Password, UserName FROM TblUser WHERE UserName = ? LIMIT 1" [MySQLText (pack id)]
     row <- Streams.read inputStream
-    return (row >>= unwrap)
+    return (row >>= unserialize)

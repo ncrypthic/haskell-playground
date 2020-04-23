@@ -3,7 +3,6 @@ module Main (main) where
 
 import Authentication.User
 import Database.MySQL.Base
-import Lim.Echo
 
 main :: IO ()
 -- main = putStrLn "Hello world"
@@ -14,7 +13,6 @@ main = do
     _ <- putStrLn $ spec "Hello"
     conn <- connect
         defaultConnectInfo { ciUser = "root", ciPassword = "asdf", ciDatabase = "erp" }
-    res <- findUserById conn "asd"
-    case res of
-      Just user -> putStrLn $ userName user
-      _ -> putStrLn "Nothing"
+    id <- getLine
+    res <- findUserById conn id
+    print res

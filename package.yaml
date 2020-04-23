@@ -7,7 +7,9 @@ dependencies:
 license: MIT
 
 executable:
-  source-dirs: app src
+  source-dirs:
+    app
+    src
   main: Main.hs
   other-modules:
     Lim.Echo
